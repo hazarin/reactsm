@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Routing\Annotation\Route;
 
 class FrontEndController extends AbstractController

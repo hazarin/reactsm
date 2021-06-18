@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use OpenApi\Annotations as OA;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -23,28 +25,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      */
-    private $email;
+    private ?string $email;
 
     /**
      * @ORM\Column(type="json")
+     *
+     * @OA\Property(type="array", @OA\Items(type="string"))
      */
-    private $roles = [];
+    private array $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
-    private $password;
+    private string $password;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name = '';
+    private string $name = '';
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $last_name = '';
+    private string $last_name = '';
+
+    /**
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="user")
+     */
+    private ArrayCollection $comments;
+
+    public function __construct() {
+        $this->comments = new ArrayCollection();
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getComments(): ArrayCollection
+    {
+        return $this->comments;
+    }
+
+    /**
+     * @param ArrayCollection $comments
+     */
+    public function setComments(ArrayCollection $comments): void
+    {
+        $this->comments = $comments;
+    }
 
     public function getId(): ?int
     {
