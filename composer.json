@@ -4,7 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.2.5",
+        "php": "^7.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-json": "*",
@@ -30,6 +30,7 @@
         "symfony/mime": "5.3.*",
         "symfony/monolog-bundle": "^3.1",
         "symfony/notifier": "5.3.*",
+        "symfony/polyfill-php74": "^1.23",
         "symfony/process": "5.3.*",
         "symfony/property-access": "5.3.*",
         "symfony/property-info": "5.3.*",
@@ -42,6 +43,7 @@
         "symfony/twig-bundle": "^5.3",
         "symfony/validator": "5.3.*",
         "symfony/web-link": "5.3.*",
+        "symfony/webpack-encore-bundle": "^1.12",
         "symfony/yaml": "5.3.*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
@@ -78,7 +80,8 @@
     "replace": {
         "symfony/polyfill-ctype": "*",
         "symfony/polyfill-iconv": "*",
-        "symfony/polyfill-php72": "*"
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php74": "*"
     },
     "scripts": {
         "auto-scripts": {

@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints;
 class ArticleController extends AbstractController
 {
     /**
-     * @var ?Request $request
+     * @var Request|null
      */
     private ?Request $request;
 
