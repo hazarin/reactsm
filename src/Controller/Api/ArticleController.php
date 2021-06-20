@@ -59,6 +59,31 @@ class ArticleController extends AbstractController
     }
 
     /**
+     * Retrieve article by id
+     *
+     * @Route("/{id}", name="api_article", methods={"GET"}, requirements={"id"="\d+"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Article",
+     *     @Model(type=Article::class)
+     * )
+     *
+     * @OA\Tag(name="article")
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function getArticle(int $id): JsonResponse
+    {
+        $article = $this->getDoctrine()->getRepository(Article::class)->find($id);
+        if ($article === null) {
+            return $this->json(['error' => 'Object not found'], 404);
+        }
+
+        return $this->json($article);
+    }
+
+    /**
      * Create article
      *
      * @Route("/", name="api_article_create", methods={"POST"})

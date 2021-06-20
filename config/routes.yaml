@@ -1,3 +1,9 @@
+frontend_index:
+  path: '/{reactRouting}'
+  defaults: { _controller: App\Controller\FrontEndController::index }
+  requirements:
+    reactRouting: "^((?!api).)*$"
+
 login:
   path:     /api/auth/login
   methods:  [POST]

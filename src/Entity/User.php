@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -53,24 +54,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="user")
      */
-    private ArrayCollection $comments;
+    private Collection $comments;
 
     public function __construct() {
         $this->comments = new ArrayCollection();
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection
      */
-    public function getComments(): ArrayCollection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
 
     /**
-     * @param ArrayCollection $comments
+     * @param Collection $comments
      */
-    public function setComments(ArrayCollection $comments): void
+    public function setComments(Collection $comments): void
     {
         $this->comments = $comments;
     }

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Mapping\EntityTimeStampBase;
 use App\Repository\ArticleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -46,16 +47,16 @@ class Article extends EntityTimeStampBase
     /**
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="article")
      */
-    private ArrayCollection $comments;
+    private Collection $comments;
 
     public function __construct() {
         $this->comments = new ArrayCollection();
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection
      */
-    public function getComments(): ArrayCollection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -63,7 +64,7 @@ class Article extends EntityTimeStampBase
     /**
      * @param ArrayCollection $comments
      */
-    public function setComments(ArrayCollection $comments): void
+    public function setComments(Collection $comments): void
     {
         $this->comments = $comments;
     }
