@@ -1,0 +1,10 @@
+.content-container {
+    padding-top: 48px;
+}
+.h2 a.article-link {
+    color: inherit;
+}
+.h2 a.article-link:hover {
+    text-decoration: none;
+    opacity: 0.7;
+}
