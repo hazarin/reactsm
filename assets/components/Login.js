@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Col, Form, Row } from 'react-bootstrap'
 import { Redirect, useLocation } from 'react-router-dom'
-import { AuthContext } from '../context/AuthContext'
+import { useAuth } from '../context/AuthContext'
 
 const { API_HOST } = process.env
 
 const Login = () => {
-  const user = useContext(AuthContext)
+  const { user, setUser } = useAuth()
   const [validated, setValidated] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -31,7 +31,20 @@ const Login = () => {
           return res.json()
         })
         .then((data) => {
-          user.setUser({ ...user, token: data.token })
+          setUser({ ...user, token: data.token })
+          fetch(`${API_HOST}/api/auth/profile/`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${data.token}`,
+            },
+          })
+            .then((res) => {
+              return res.json()
+            })
+            .then((data) => {
+              setUser({ ...user, profile: data, loggedIn: false })
+            })
         })
     }
     setValidated(true)
@@ -39,7 +52,7 @@ const Login = () => {
 
   // eslint-disable-next-line consistent-return
   useEffect(() => {
-    if (user) {
+    if (user.loggedIn) {
       return (
         <Redirect
           to={{

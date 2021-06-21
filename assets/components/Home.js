@@ -4,21 +4,29 @@ import { Switch, Route, Link } from 'react-router-dom'
 import Articles from './Articles'
 import Login from './Login'
 import Article from './Article'
+import { useAuth } from '../context/AuthContext'
 
 const Home = () => {
+  const { user } = useAuth()
   return (
     <Container style={{ minHeight: '100vh' }}>
       <Navbar bg="light" expand="lg">
         <Navbar.Brand as={Link} to="/">
           Test app
         </Navbar.Brand>
+        {user.loggedIn && (
+          <Navbar.Brand>{`Logged in as ${user.profile.name}`}</Navbar.Brand>
+        )}
         <Nav className="ml-auto">
           <Nav.Link as={Link} to="/">
             Home
           </Nav.Link>
-          <Nav.Link as={Link} to="/login">
-            Login
-          </Nav.Link>
+          {user.loggedIn && <Nav.Link>Logout</Nav.Link>}
+          {!user.loggedIn && (
+            <Nav.Link as={Link} to="/login">
+              Login
+            </Nav.Link>
+          )}
         </Nav>
       </Navbar>
       <Container className="content-container">
