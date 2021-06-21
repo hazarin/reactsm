@@ -5,7 +5,7 @@
 `cd reactsm`   
 `docker-compose up -d`
 
-After that application available at https://127.0.0.1/
+After that application available at https://127.0.0.1:8000/
 
 During build user & article fixtures applied to database
 
