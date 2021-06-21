@@ -8,3 +8,22 @@
     text-decoration: none;
     opacity: 0.7;
 }
+.comment-dropdown {
+    display: inline-block;
+}
+.btn-primary.comment-toggle {
+    color: inherit;
+    background-color: transparent;
+    border: none;
+}
+.btn-primary:not(:disabled):not(.disabled).comment-toggle:hover,
+.btn-primary:not(:disabled):not(.disabled).comment-toggle:active,
+.btn-primary:not(:disabled):not(.disabled).comment-toggle:focus {
+    color: inherit;
+    opacity: 0.7;
+    background-color: transparent;
+    border: none;
+}
+.comment-owner {
+    color: darkgrey;
+}

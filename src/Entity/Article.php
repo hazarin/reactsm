@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ORM\Entity(repositoryClass=ArticleRepository::class)
@@ -24,6 +25,8 @@ class Article extends EntityTimeStampBase
      * @ORM\Column(type="integer")
      *
      * @OA\Property(description="Article id")
+     *
+     * @Groups({"get", "list", "article"})
      */
     private ?int $id;
 
@@ -31,7 +34,8 @@ class Article extends EntityTimeStampBase
      * @ORM\Column(type="string", length=255)
      *
      * @OA\Property(type="string", maxLength=255)
-     * @Groups({"get", "set"})
+     *
+     * @Groups({"get", "set", "list", "article"})
      */
     private string $title;
 
@@ -39,13 +43,17 @@ class Article extends EntityTimeStampBase
      * @ORM\Column(type="text")
      *
      * @OA\Property(type="text")
-     * @Groups({"get", "set"})
+     *
+     * @Groups({"get", "set", "article"})
      */
     private string $content;
 
 
     /**
+     * @MaxDepth(1)
      * @ORM\OneToMany(targetEntity="Comment", mappedBy="article")
+     *
+     * @Groups({"get", "set", "article"})
      */
     private Collection $comments;
 

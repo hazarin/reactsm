@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ORM\Entity(repositoryClass=CommentRepository::class)
@@ -21,6 +22,8 @@ class Comment extends EntityTimeStampBase
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *
+     * @Groups({"article"})
      */
     private ?int $id;
 
@@ -28,7 +31,8 @@ class Comment extends EntityTimeStampBase
      * @ORM\ManyToOne(targetEntity="User", inversedBy="comments")
      *
      * @OA\Property(ref=@Model(type=User::class))
-     * @Groups({"get", "set"})
+     *
+     * @Groups({"get", "set", "article"})
      */
     private $user;
 
@@ -36,6 +40,7 @@ class Comment extends EntityTimeStampBase
      * @ORM\ManyToOne(targetEntity="Article", inversedBy="comments")
      *
      * @OA\Property(ref=@Model(type=Article::class))
+     *
      * @Groups({"get", "set"})
      */
     private $article;
@@ -44,7 +49,8 @@ class Comment extends EntityTimeStampBase
      * @ORM\Column(type="text")
      *
      * @OA\Property(type="text")
-     * @Groups({"get", "set"})
+     *
+     * @Groups({"get", "set", "article"})
      */
     private string $text;
 
@@ -66,10 +72,13 @@ class Comment extends EntityTimeStampBase
 
     /**
      * @param mixed $user
+     * @return $this
      */
-    public function setUser($user): void
+    public function setUser($user): self
     {
         $this->user = $user;
+
+        return $this;
     }
 
     /**
@@ -82,10 +91,13 @@ class Comment extends EntityTimeStampBase
 
     /**
      * @param mixed $article
+     * @return $this
      */
-    public function setArticle($article): void
+    public function setArticle($article): self
     {
         $this->article = $article;
+
+        return $this;
     }
 
     /**

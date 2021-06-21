@@ -2,7 +2,9 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Article;
 use App\Entity\Comment;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -10,6 +12,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validation;
@@ -18,8 +21,6 @@ use Symfony\Component\Validator\Constraints;
 /**
  * Class CommentController
  * @package App\Controller\Api
- *
- * @Route("/api/comment")
  */
 class CommentController extends AbstractController
 {
@@ -37,7 +38,7 @@ class CommentController extends AbstractController
     /**
      * List comments
      *
-     * @Route("/", name="api_comment_list", methods={"GET"})
+     * @Route("/api/article/{article_id}/comment/", name="api_comment_list", methods={"GET"}, requirements={"article_id"="\d+"})
      * @OA\Response(
      *     response=200,
      *     description="Comments list",
@@ -48,12 +49,14 @@ class CommentController extends AbstractController
      * )
      *
      * @OA\Tag(name="comment")
-     *
      * @return JsonResponse
      */
-    public function list(): JsonResponse
+    public function list(int $article_id): JsonResponse
     {
-        $items = $this->getDoctrine()->getRepository(Comment::class)->findAll();
+        $items = $this
+            ->getDoctrine()
+            ->getRepository(Comment::class)
+            ->findBy(['article_id' => $article_id]);
 
         return $this->json($items);
     }
@@ -61,7 +64,7 @@ class CommentController extends AbstractController
     /**
      * Create comment
      *
-     * @Route("/", name="api_comment_create", methods={"POST"})
+     * @Route("/api/article/{article_id}/comment/", name="api_comment_create", methods={"POST"}, requirements={"article_id"="\d+"})
      * @OA\RequestBody(
      *      description="Create comment",
      *      @Model(type=Comment::class, groups={"set"}),
@@ -69,16 +72,25 @@ class CommentController extends AbstractController
      * @OA\Response(
      *     response=201,
      *     description="Comment created",
-     *     @Model(type=Comment::class)
+     *     @Model(type=Comment::class, groups={"article"})
      * )
      *
      * @OA\Tag(name="comment")
+     * @Security(name="bearer")
      *
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @param int $article_id
      * @return JsonResponse
      */
-    public function create(): JsonResponse
+    public function create(int $article_id): JsonResponse
     {
+        $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
+        $article = $em->getRepository(Article::class)->find($article_id);
+        if ($article === null) {
+            return $this->json(['error' => 'Article not found'], 404);
+        }
+
         $data = $this->validate();
 
         if (is_array($data) === false) {
@@ -86,7 +98,10 @@ class CommentController extends AbstractController
         }
 
         $comment = new Comment();
-        $comment->setText($data['text']);
+        $comment
+            ->setUser($user)
+            ->setArticle($article)
+            ->setText($data['text']);
 
         try {
             $em->persist($comment);
@@ -95,13 +110,13 @@ class CommentController extends AbstractController
             return $this->json(['error' => $e->getMessage()], 500);
         }
 
-        return $this->json($comment, 201);
+        return $this->json($comment, Response::HTTP_CREATED, [], ['groups' => ['article']]);
     }
 
     /**
      * Update comment
      *
-     * @Route("/{id}/", name="api_comment_update", methods={"PUT"}, requirements={"id"="\d+"})
+     * @Route("/api/comment/{id}/", name="api_comment_update", methods={"PUT"}, requirements={"id"="\d+"})
      *
      * @OA\RequestBody(
      *      description="Update comment",
@@ -110,26 +125,31 @@ class CommentController extends AbstractController
      * @OA\Response(
      *     response=200,
      *     description="Comment updated",
-     *     @Model(type=Comment::class)
+     *     @Model(type=Comment::class, groups={"article"})
      * )
      *
      * @OA\Tag(name="comment")
      *
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param int $id
      * @return JsonResponse
      */
     public function update(int $id): JsonResponse
     {
-        $em = $this->getDoctrine()->getManager();
-        $comment = $this->getDoctrine()->getRepository(Comment::class)->find($id);
-        if ($comment === null) {
-            return $this->json(['error' => 'Object not found'], 404);
-        }
-
         $data = $this->validate();
 
         if (is_array($data) === false) {
             return $this->json(['error' => (string)$data], 500);
+        }
+
+        $user = $this->getUser();
+        $em = $this->getDoctrine()->getManager();
+        $comment = $em->getRepository(Comment::class)->find($id);
+        if ($comment === null) {
+            return $this->json(['error' => 'Object not found'], 404);
+        }
+        if ($this->isGranted('ROLE_ADMIN') === false && $comment->getUser() !== $user) {
+            return $this->json(['error' => 'Access denied'], 403);
         }
 
         $comment->setText($data['text']);
@@ -141,13 +161,13 @@ class CommentController extends AbstractController
             return $this->json(['error' => $e->getMessage()], 500);
         }
 
-        return $this->json($comment);
+        return $this->json($comment, Response::HTTP_CREATED, [], ['groups' => ['article']]);
     }
 
     /**
      * Delete comment
      *
-     * @Route("/{id}/", name="api_comment_delete", methods={"DELETE"}, requirements={"id"="\d+"})
+     * @Route("/api/comment/{id}/", name="api_comment_delete", methods={"DELETE"}, requirements={"id"="\d+"})
      *
      * @OA\Response(
      *     response=204,
@@ -156,15 +176,20 @@ class CommentController extends AbstractController
      *
      * @OA\Tag(name="comment")
      *
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      * @param int $id
      * @return JsonResponse
      */
     public function delete(int $id): JsonResponse
     {
+        $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
-        $comment = $this->getDoctrine()->getRepository(Comment::class)->find($id);
+        $comment = $em->getRepository(Comment::class)->find($id);
         if ($comment === null) {
             return $this->json(['error' => 'Object not found'], 404);
+        }
+        if ($this->isGranted('ROLE_ADMIN') === false && $comment->getUser() !== $user) {
+            return $this->json(['error' => 'Access denied'], 403);
         }
 
         try {

@@ -9,10 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="`user`")
+ *
+ * @OA\Schema()
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -20,11 +23,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     *
+     * @Groups({"article", "get"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     *
+     * @Groups({"article", "get"})
      */
     private ?string $email;
 
@@ -43,11 +50,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @Groups({"article", "get"})
      */
     private string $name = '';
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @Groups({"article", "get"})
      */
     private string $last_name = '';
 

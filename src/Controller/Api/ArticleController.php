@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Article;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -10,6 +11,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validation;
@@ -33,7 +35,6 @@ class ArticleController extends AbstractController
         $this->request = $request->getCurrentRequest();
     }
 
-
     /**
      * List articles
      *
@@ -43,7 +44,7 @@ class ArticleController extends AbstractController
      *     description="Articles list",
      *     @OA\JsonContent(
      *        type="array",
-     *        @OA\Items(ref=@Model(type=Article::class))
+     *        @OA\Items(ref=@Model(type=Article::class, groups={"list"}))
      *      ),
      * )
      *
@@ -55,7 +56,7 @@ class ArticleController extends AbstractController
     {
         $items = $this->getDoctrine()->getRepository(Article::class)->findAll();
 
-        return $this->json($items);
+        return $this->json($items, Response::HTTP_OK, [], ['groups' => ['list']]);
     }
 
     /**
@@ -65,7 +66,7 @@ class ArticleController extends AbstractController
      * @OA\Response(
      *     response=200,
      *     description="Article",
-     *     @Model(type=Article::class)
+     *     @Model(type=Article::class, groups={"article"})
      * )
      *
      * @OA\Tag(name="article")
@@ -80,7 +81,7 @@ class ArticleController extends AbstractController
             return $this->json(['error' => 'Object not found'], 404);
         }
 
-        return $this->json($article);
+        return $this->json($article, Response::HTTP_OK, [], ['groups' => ['article']]);
     }
 
     /**
@@ -99,6 +100,7 @@ class ArticleController extends AbstractController
      *
      * @OA\Tag(name="article")
      *
+     * @IsGranted("ROLE_ADMIN")
      * @return JsonResponse
      */
     public function create(): JsonResponse
@@ -142,6 +144,7 @@ class ArticleController extends AbstractController
      *
      * @OA\Tag(name="article")
      *
+     * @IsGranted("ROLE_ADMIN")
      * @param int $id
      * @return JsonResponse
      */
@@ -185,6 +188,7 @@ class ArticleController extends AbstractController
      *
      * @OA\Tag(name="article")
      *
+     * @IsGranted("ROLE_ADMIN")
      * @param int $id
      * @return JsonResponse
      */

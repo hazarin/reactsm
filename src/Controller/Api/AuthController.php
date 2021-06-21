@@ -3,9 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints;
@@ -22,10 +25,19 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class AuthController extends AbstractController
 {
-    private $passwordHasher;
+    /**
+     * @var Request|null
+     */
+    private ?Request $request;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    /**
+     * @var UserPasswordHasherInterface
+     */
+    private UserPasswordHasherInterface $passwordHasher;
+
+    public function __construct(RequestStack $request, UserPasswordHasherInterface $passwordHasher)
     {
+        $this->request = $request->getCurrentRequest();
         $this->passwordHasher = $passwordHasher;
     }
 
@@ -70,11 +82,9 @@ class AuthController extends AbstractController
      */
     public function register(): JsonResponse
     {
-        /** @var Request $request */
-        $request = $this->get('request_stack')->getCurrentRequest();
         $em = $this->getDoctrine()->getManager();
 
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($this->request->getContent(), true);
         $validator = Validation::createValidator();
         $constraint = new Constraints\Collection([
             'password' => new Constraints\Length(['min' => 1]),
@@ -107,5 +117,27 @@ class AuthController extends AbstractController
         }
 
         return $this->json(['success' => $user->getUserIdentifier().' registered']);
+    }
+
+    /**
+     * Retrieve user profile .
+     *
+     * @Route("/profile", name="api_auth_profile", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="User profile",
+     *     @Model(type=User::class, groups={"article"})
+     * )
+     *
+     * @OA\Tag(name="auth")
+     *
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
+     * @return JsonResponse
+     */
+    public function profileAction(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        return $this->json($user, Response::HTTP_OK, [], ['groups' => ['article']]);
     }
 }

@@ -17,7 +17,7 @@ class EntityTimeStampBase implements EntityTimeStampInterface
 {
     /**
      * @ORM\Column(name="created_at", type="datetime")
-     * @Groups({"get"})
+     * @Groups({"get", "article"})
      */
     protected $createdAt;
 

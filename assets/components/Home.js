@@ -7,7 +7,12 @@ import Article from './Article'
 import { useAuth } from '../context/AuthContext'
 
 const Home = () => {
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
+
+  const handleLogout = () => {
+    setUser({ profile: null, token: null, loggedIn: false })
+  }
+
   return (
     <Container style={{ minHeight: '100vh' }}>
       <Navbar bg="light" expand="lg">
@@ -21,7 +26,9 @@ const Home = () => {
           <Nav.Link as={Link} to="/">
             Home
           </Nav.Link>
-          {user.loggedIn && <Nav.Link>Logout</Nav.Link>}
+          {user.loggedIn && (
+            <Nav.Link onClick={() => handleLogout()}>Logout</Nav.Link>
+          )}
           {!user.loggedIn && (
             <Nav.Link as={Link} to="/login">
               Login

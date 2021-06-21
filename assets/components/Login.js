@@ -12,7 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const location = useLocation()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const form = e.currentTarget
     if (form.checkValidity() === false) {
@@ -20,32 +20,32 @@ const Login = () => {
     }
 
     if (!user.token) {
-      fetch(`${API_HOST}/api/auth/login`, {
+      const res = await fetch(`${API_HOST}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username: email, password }),
       })
-        .then((res) => {
-          return res.json()
+      const token = await res.json()
+      if (res.ok) {
+        const res = await fetch(`${API_HOST}/api/auth/profile/`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token.token}`,
+          },
         })
-        .then((data) => {
-          setUser({ ...user, token: data.token })
-          fetch(`${API_HOST}/api/auth/profile/`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${data.token}`,
-            },
+        const data = await res.json()
+        if (res.ok) {
+          setUser({
+            ...user,
+            profile: data,
+            token: token.token,
+            loggedIn: true,
           })
-            .then((res) => {
-              return res.json()
-            })
-            .then((data) => {
-              setUser({ ...user, profile: data, loggedIn: false })
-            })
-        })
+        }
+      }
     }
     setValidated(true)
   }
