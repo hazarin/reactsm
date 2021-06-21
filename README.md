@@ -12,7 +12,7 @@ During build user & article fixtures applied to database
 Users:   
 login: one@one.com password: User1   
 login: two@two.com password: User2   
-Admin:
+Admin:   
 login: admin@admin.com password: Admin
 
 Backend API doc https://127.0.0.1:8000/api/doc
