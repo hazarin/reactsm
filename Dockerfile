@@ -40,7 +40,6 @@ RUN ./bin/console doctrine:database:create -n
 RUN ./bin/console doctrine:migrations:migrate -n
 RUN ./bin/console doctrine:fixtures:load -n
 RUN ./bin/console assets:install --symlink -n
-RUN ./bin/console assets:install --symlink -n
 RUN symfony server:ca:install
 
 EXPOSE 8000

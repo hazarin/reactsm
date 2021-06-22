@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Col, Form, Row } from 'react-bootstrap'
-import { Redirect, useLocation } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const { API_HOST } = process.env
@@ -10,7 +10,7 @@ const Login = () => {
   const [validated, setValidated] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const location = useLocation()
+  const history = useHistory()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -53,14 +53,7 @@ const Login = () => {
   // eslint-disable-next-line consistent-return
   useEffect(() => {
     if (user.loggedIn) {
-      return (
-        <Redirect
-          to={{
-            pathname: '/',
-            state: { from: location },
-          }}
-        />
-      )
+      history.push('/')
     }
   }, [user])
 

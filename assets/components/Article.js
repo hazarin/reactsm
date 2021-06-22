@@ -54,6 +54,7 @@ const Article = () => {
       }
       setComment('')
       setArticle(newArticle)
+      setCommentId(null)
     }
   }
 

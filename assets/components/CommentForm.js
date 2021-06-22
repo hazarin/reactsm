@@ -20,11 +20,6 @@ const CommentForm = (props) => {
           name="text"
           value={comment}
           onChange={(e) => {
-            if (e.currentTarget.value) {
-              setShowButtons(true)
-            } else {
-              setShowButtons(false)
-            }
             setComment(e.currentTarget.value)
           }}
         />
