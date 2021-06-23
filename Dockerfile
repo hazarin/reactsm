@@ -18,7 +18,7 @@ FROM php:7.4-alpine AS runner
 WORKDIR /app
 
 RUN apk add --no-cache zip unzip git wget bash
-RUN wget https://get.symfony.com/cli/installer -O - | bash
+#RUN wget https://get.symfony.com/cli/installer -O - | bash
 
 COPY --from=builder /app/public ./public
 COPY ./bin ./bin
@@ -33,8 +33,9 @@ COPY composer.json .
 COPY composer.lock .
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=symfonycorp/cli symfony /usr/local/bin/symfony
 RUN composer install
-RUN mv /root/.symfony/bin/symfony /usr/local/bin/symfony
+#RUN mv /root/.symfony/bin/symfony /usr/local/bin/symfony
 
 RUN ./bin/console doctrine:database:create -n
 RUN ./bin/console doctrine:migrations:migrate -n
