@@ -1,11 +1,11 @@
-FROM node:14-alpine AS deps
+FROM node:14 AS deps
 
-RUN apk add --no-cache libc6-compat
+#RUN apt install --no-cache libc6-compat && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --network-timeout 1000000
 
-FROM node:14-alpine AS builder
+FROM node:14 AS builder
 WORKDIR /app
 COPY --from=deps /app/ ./
 COPY ./assets ./assets
@@ -14,10 +14,10 @@ COPY .babelrc .
 COPY .env .
 RUN yarn build
 
-FROM php:7.4-alpine AS runner
+FROM php:7.4 AS runner
 WORKDIR /app
 
-RUN apk add --no-cache zip unzip git wget bash
+RUN apt update && apt install zip unzip git curl -y && rm -rf /var/lib/apt/lists/*
 #RUN wget https://get.symfony.com/cli/installer -O - | bash
 
 COPY --from=builder /app/public ./public
